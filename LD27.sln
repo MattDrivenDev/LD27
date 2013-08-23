@@ -1,0 +1,24 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LD27", "LD27\LD27\LD27.csproj", "{694A4093-90D5-4843-9CEA-58B7795A06CE}"
+EndProject
+Project("{96E2B04D-8817-42C6-938A-82C39BA4D311}") = "LD27Content", "LD27\LD27Content\LD27Content.contentproj", "{FF52538C-9EF6-4F39-B01C-E42E54F0228C}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x86 = Debug|x86
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{694A4093-90D5-4843-9CEA-58B7795A06CE}.Debug|x86.ActiveCfg = Debug|x86
+		{694A4093-90D5-4843-9CEA-58B7795A06CE}.Debug|x86.Build.0 = Debug|x86
+		{694A4093-90D5-4843-9CEA-58B7795A06CE}.Release|x86.ActiveCfg = Release|x86
+		{694A4093-90D5-4843-9CEA-58B7795A06CE}.Release|x86.Build.0 = Release|x86
+		{FF52538C-9EF6-4F39-B01C-E42E54F0228C}.Debug|x86.ActiveCfg = Debug|x86
+		{FF52538C-9EF6-4F39-B01C-E42E54F0228C}.Release|x86.ActiveCfg = Release|x86
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
