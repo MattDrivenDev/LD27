@@ -10,7 +10,7 @@ namespace LD27
         /// </summary>
         static void Main(string[] args)
         {
-            using (Game1 game = new Game1())
+            using (LD27Game game = new LD27Game())
             {
                 game.Run();
             }

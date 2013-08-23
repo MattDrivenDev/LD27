@@ -14,12 +14,12 @@ namespace LD27
     /// <summary>
     /// This is the main type for your game
     /// </summary>
-    public class Game1 : Microsoft.Xna.Framework.Game
+    public class LD27Game : Microsoft.Xna.Framework.Game
     {
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
 
-        public Game1()
+        public LD27Game()
         {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
