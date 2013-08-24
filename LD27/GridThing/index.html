@@ -1,0 +1,196 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>Content-Layout Demo</title>
+        <link href="css/contentlayoutdemo.css" rel="stylesheet" type="text/css">
+        <link href="scripts/jquery.gridster.min.css" rel="stylesheet" type="text/css">
+        
+        <script src="scripts/jquery-1.9.1.min.js"></script>
+        <script src="scripts/jquery.gridster.min.js"></script>
+        <script src="scripts/jquery.cookie.js"></script>
+    </head>
+    
+    <body>
+    <!--<div class="gridster">
+        <ul>
+            <li data-row="1" data-col="1" data-sizey="2" data-sizex="2" id="boxA">A</li>
+            <li data-row="1" data-col="1" data-sizey="1" data-sizex="1" id="boxB">B</li>
+            <li data-row="1" data-col="1" data-sizey="1" data-sizex="1" id="boxC">C</li>
+            <li data-row="1" data-col="1" data-sizey="1" data-sizex="1" id="boxD">D</li>
+            <li data-row="1" data-col="1" data-sizey="1" data-sizex="1" id="boxE">E</li>
+            
+            <li data-row="1" data-col="1" data-sizey="2" data-sizex="1" id="boxF">F</li>
+            <li data-row="1" data-col="1" data-sizey="1" data-sizex="1" id="boxG">G</li>
+            <li data-row="1" data-col="1" data-sizey="1" data-sizex="2" id="boxH">H</li>
+            <li data-row="1" data-col="1" data-sizey="1" data-sizex="1" id="boxI">I</li>
+            <li data-row="1" data-col="1" data-sizey="1" data-sizex="1" id="boxJ">J</li>
+        </ul>
+    </div>-->
+    <!--STAND BACK I'M DOING WEB DEVELOPMENT-->
+    
+    <script type="text/javascript">
+	$('<div id="main" class="gridster"></div>').appendTo('body');
+
+	if($.cookie("grid-data") == null) {
+		var json = [
+		  {
+			"id": "boxA",
+			"col": 1,
+			"row": 1,
+			"size_y": 1,
+			"size_x": 1
+		  },
+		  {
+			"id": "boxB",
+			"col": 2,
+			"row": 1,
+			"size_y": 1,
+			"size_x": 1
+		  },
+		  {
+			"id": "boxC",
+			"col": 3,
+			"row": 1,
+			"size_y": 1,
+			"size_x": 1
+		  },
+		  {
+			"id": "boxD",
+			"col": 4,
+			"row": 1,
+			"size_y": 1,
+			"size_x": 1
+		  },
+		  {
+			"id": "boxE",
+			"col": 1,
+			"row": 2,
+			"size_y": 1,
+			"size_x": 1
+		  },
+		  {
+			"id": "boxF",
+			"col": 2,
+			"row": 2,
+			"size_y": 1,
+			"size_x": 1
+		  },
+		  {
+			"id": "boxG",
+			"col": 3,
+			"row": 2,
+			"size_y": 1,
+			"size_x": 1
+		  },
+		  {
+			"id": "boxH",
+			"col": 4,
+			"row": 2,
+			"size_y": 1,
+			"size_x": 1
+		  },
+		  {
+			"id": "boxI",
+			"col": 1,
+			"row": 3,
+			"size_y": 1,
+			"size_x": 1
+		  },
+		  {
+			"id": "boxJ",
+			"col": 2,
+			"row": 3,
+			"size_y": 1,
+			"size_x": 1
+		  },
+		  {
+			"id": "boxK",
+			"col": 3,
+			"row": 3,
+			"size_y": 1,
+			"size_x": 1
+		  },
+		  {
+			"id": "boxL",
+			"col": 4,
+			"row": 3,
+			"size_y": 1,
+			"size_x": 1
+		  },
+		  {
+			"id": "boxM",
+			"col": 1,
+			"row": 4,
+			"size_y": 1,
+			"size_x": 1
+		  },
+		  {
+			"id": "boxN",
+			"col": 2,
+			"row": 4,
+			"size_y": 1,
+			"size_x": 1
+		  },
+		  {
+			"id": "boxO",
+			"col": 3,
+			"row": 4,
+			"size_y": 1,
+			"size_x": 1
+		  },
+		  {
+			"id": "boxP",
+			"col": 4,
+			"row": 4,
+			"size_y": 1,
+			"size_x": 1
+		  },
+		];
+	} else {
+		var json = JSON.parse($.cookie("grid-data"));
+	}
+
+	var grid = $("#main").gridster({
+			draggable: {
+			stop: function(event, ui){ 
+				$.cookie("grid-data", JSON.stringify(grid.serialize()), { domain: "" });
+			}
+		},
+		widget_margins: [10, 10],
+		widget_base_dimensions: [140, 140],
+		serialize_params: function($w, wgd) { 
+			return { 
+				id: wgd.el[0].id, 
+				col: wgd.col, 
+				row: wgd.row,
+				size_y: wgd.size_y,
+				size_x: wgd.size_x,
+			} 
+		}
+	}).data('gridster');
+	
+	for(i=0; i<json.length; i++) {
+		grid.add_widget(
+			'<div id="' + json[i]['id'] + '"><p>' + json[i]['id'] + '</p></div>', 
+			json[i]['size_x'], 
+			json[i]['size_y'], 
+			json[i]['col'], 
+			json[i]['row'] 
+		);
+	}
+	
+	$.cookie("grid-data", JSON.stringify(grid.serialize()));
+	  //var gridster;
+//	
+//	  $(function(){
+//		gridster = $(".gridster > ul").gridster({
+//			widget_margins: [10, 10],
+//			widget_base_dimensions: [140, 140],
+//			min_cols: 6
+//		}).data('gridster');
+//	  });
+
+    </script>
+    </body>
+</html>

@@ -39,7 +39,7 @@ namespace LD27
           
         }
 
-        public void Update(GameTime gameTime, VoxelWorld gameWorld)
+        public void Update(GameTime gameTime, VoxelWorld gameWorld, Vector3 shake)
         {
             Offset = new Vector3(0, 60, -50);// -(new Vector3(0, Position.Z, -Position.Z) * 0.3f);
             //Offset = new Vector3(0, 20, -10);// - (new Vector3(0,Position.Z,-Position.Z) * 0.3f);
@@ -51,7 +51,7 @@ namespace LD27
 
 
 
-            viewMatrix = Matrix.CreateLookAt(Position + Offset, Position + new Vector3(0, 20, 0), Vector3.Down);
+            viewMatrix = Matrix.CreateLookAt(Position + Offset, Position + new Vector3(0, 20, 0) + shake, Vector3.Down);
             //viewMatrix = Matrix.CreateLookAt(Position + Offset, Position + new Vector3(0, 0, 0), Vector3.Down);
             boundingFrustum.Matrix = viewMatrix * projectionMatrix;
         }

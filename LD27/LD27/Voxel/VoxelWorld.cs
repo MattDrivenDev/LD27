@@ -129,22 +129,23 @@ namespace LD27
                     }
         }
 
-        public Vector3 FromScreenSpace(Vector3 screen)
+        public static Vector3 FromScreenSpace(Vector3 screen)
         {
             Vector3 vox = new Vector3(screen.X/Voxel.SIZE, screen.Y/Voxel.SIZE, screen.Z/Voxel.SIZE);
 
             return vox;
         }
 
-        public Vector3 ToScreenSpace(int x, int y, int z)
+        public static Vector3 ToScreenSpace(int x, int y, int z)
         {
             Vector3 screen = new Vector3(x * Voxel.SIZE, y * Voxel.SIZE, z * Voxel.SIZE);
 
             return screen;
         }
 
-        public void CopySprite(int x, int y, int z, AnimChunk c)
+        public void CopySprite(int x, int y, int z, AnimChunk c, int rot)
         {
+            
             for (int xx = 0; xx < c.X_SIZE; xx++)
             {
                 for (int yy = 0; yy < c.Y_SIZE; yy++)
@@ -153,7 +154,15 @@ namespace LD27
                     {
                         if (c.Voxels[xx, yy, zz].Active)
                         {
-                            SetVoxel(x + xx, y+ ((c.Z_SIZE-1)-zz), z + yy, true, 0, VoxelType.Prefab, c.Voxels[xx,yy,zz].Color, new Color(c.Voxels[xx,yy,zz].Color.ToVector3()*0.5f));
+                            if(rot==0)
+                                SetVoxel(x + xx, y+ ((c.Z_SIZE-1)-zz), z + yy, true, 0, VoxelType.Prefab, c.Voxels[xx,yy,zz].Color, new Color(c.Voxels[xx,yy,zz].Color.ToVector3()*0.5f));
+                            if(rot==1)
+                                SetVoxel(x + zz, y + ((c.Z_SIZE - 1) - xx), z + yy, true, 0, VoxelType.Prefab, c.Voxels[xx, yy, zz].Color, new Color(c.Voxels[xx, yy, zz].Color.ToVector3() * 0.5f));
+                            if (rot == 2)
+                                SetVoxel(x + xx, y+ ((c.Z_SIZE-1)-zz), z + ((c.Z_SIZE-1) - yy), true, 0, VoxelType.Prefab, c.Voxels[xx,yy,zz].Color, new Color(c.Voxels[xx,yy,zz].Color.ToVector3()*0.5f));
+                            if (rot == 3)
+                                SetVoxel(x + xx, y + ((c.Z_SIZE - 1) - zz), z + yy, true, 0, VoxelType.Prefab, c.Voxels[xx, yy, zz].Color, new Color(c.Voxels[xx, yy, zz].Color.ToVector3() * 0.5f));
+
                         }
                     }
                 }
