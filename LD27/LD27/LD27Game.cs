@@ -26,7 +26,9 @@ namespace LD27
 
         Hero gameHero;
         Camera gameCamera;
+
         ParticleController particleController;
+        BombController bombController;
 
         BasicEffect drawEffect;
 
@@ -34,9 +36,11 @@ namespace LD27
         Texture2D roomIcon;
 
         MouseState lms;
+        KeyboardState lks;
 
         VoxelSprite tileSheet;
         VoxelSprite doorSheet;
+        VoxelSprite objectSheet;
 
         int exitRoomX;
         int exitRoomY;
@@ -90,9 +94,12 @@ namespace LD27
             LoadVoxels.LoadSprite(Path.Combine(Content.RootDirectory, "tiles.vxs"), ref tileSheet);
             doorSheet = new VoxelSprite(16,16,16);
             LoadVoxels.LoadSprite(Path.Combine(Content.RootDirectory, "door.vxs"), ref doorSheet);
+            objectSheet = new VoxelSprite(16, 16, 16);
+            LoadVoxels.LoadSprite(Path.Combine(Content.RootDirectory, "dynamic.vxs"), ref objectSheet);
 
             gameCamera = new Camera(GraphicsDevice, GraphicsDevice.Viewport);
             particleController = new ParticleController(GraphicsDevice);
+            bombController = new BombController(GraphicsDevice, objectSheet);
 
             drawEffect = new BasicEffect(GraphicsDevice)
             {
@@ -158,6 +165,8 @@ namespace LD27
 
                 gameHero.Move(virtualJoystick);
 
+                if (cks.IsKeyDown(Keys.Space) && !lks.IsKeyDown(Keys.Space)) gameHero.TryPlantBomb(currentRoom);
+
                 int openCount = 0;
                 foreach (Door d in Doors) if (d.IsOpen) openCount++;
 
@@ -165,6 +174,7 @@ namespace LD27
                 switch (roomState)
                 {
                     case RoomState.DoorsOpening:
+                        OpenDoors();
                         if (openCount > 0) roomState = RoomState.DoorsOpen;
                         doorCountdown = doorCountdownTarget;
                         break;
@@ -175,12 +185,12 @@ namespace LD27
 
                             if (doorCountdown <= 0)
                             {
-                                foreach (Door d in Doors) d.Close();
                                 roomState = RoomState.DoorsClosing;
                             }
                         }
                         break;
                     case RoomState.DoorsClosing:
+                        foreach (Door d in Doors) d.Close(false);
                         if (openCount == 0)
                         {
                             roomMovesLeft = 3 + Helper.Random.Next(5);
@@ -189,6 +199,7 @@ namespace LD27
                         }
                         break;
                     case RoomState.RoomsShifting:
+                        foreach (Door d in Doors) d.Close(true);
                         if (roomShift != null)
                         {
                             roomShift.Update(gameTime, gameHero, ref Rooms);
@@ -200,7 +211,6 @@ namespace LD27
                         }
                         if (roomShift == null && roomMovesLeft == 0)
                         {
-                            OpenDoors();
                             roomState = RoomState.DoorsOpening;
                         }
                         break;
@@ -212,10 +222,15 @@ namespace LD27
                 else
                     gameCamera.Update(gameTime, currentRoom.World, Vector3.Zero);
 
-                currentRoom.World.Update(gameTime, gameCamera);
+                foreach(Room r in Rooms)
+                    if(r.World!=null) r.World.Update(gameTime, gameCamera, currentRoom==r);
+                //currentRoom.World.Update(gameTime, gameCamera);
 
-                gameHero.Update(gameTime, gameCamera, currentRoom);
+                gameHero.Update(gameTime, gameCamera, currentRoom, Doors, ref Rooms);
+                currentRoom = Rooms[gameHero.RoomX, gameHero.RoomY];
+
                 particleController.Update(gameTime, gameCamera, currentRoom.World);
+                bombController.Update(gameTime, currentRoom, gameHero);
 
                 foreach (Door d in Doors) d.Update(gameTime);
 
@@ -223,6 +238,7 @@ namespace LD27
                 drawEffect.World = gameCamera.worldMatrix;
 
                 lms = cms;
+                lks = cks;
             }
 
             base.Update(gameTime);
@@ -269,6 +285,7 @@ namespace LD27
             }
 
             foreach (Door d in Doors) d.Draw(GraphicsDevice, gameCamera, drawEffect);
+            bombController.Draw(gameCamera, currentRoom);
 
             gameHero.Draw(GraphicsDevice, gameCamera);
 
@@ -291,10 +308,10 @@ namespace LD27
 #region DOOR SHIT
         void OpenDoors()
         {
-            if (gameHero.RoomX > 0 && !Rooms[gameHero.RoomX - 1, gameHero.RoomY].IsGap) Doors[3].Open();
-            if (gameHero.RoomX < 3 && !Rooms[gameHero.RoomX + 1, gameHero.RoomY].IsGap) Doors[1].Open();
-            if (gameHero.RoomY > 0 && !Rooms[gameHero.RoomX, gameHero.RoomY-1].IsGap) Doors[0].Open();
-            if (gameHero.RoomY < 3 && !Rooms[gameHero.RoomX, gameHero.RoomY+1].IsGap) Doors[2].Open();
+            if (gameHero.RoomX > 0 && !Rooms[gameHero.RoomX - 1, gameHero.RoomY].IsGap) Doors[3].Open(false);
+            if (gameHero.RoomX < 3 && !Rooms[gameHero.RoomX + 1, gameHero.RoomY].IsGap) Doors[1].Open(false);
+            if (gameHero.RoomY > 0 && !Rooms[gameHero.RoomX, gameHero.RoomY-1].IsGap) Doors[0].Open(false);
+            if (gameHero.RoomY < 3 && !Rooms[gameHero.RoomX, gameHero.RoomY+1].IsGap) Doors[2].Open(false);
 
         }
 

@@ -120,9 +120,9 @@ namespace LD27
 
             for (int i = 0; i < 9; i++) lightingDirs[i] = false;
 
-            for (int zz = 0; zz < 6; zz++)
+            for (int zz = 0; zz < 8; zz++)
             {
-                float intensity = (intensityFactor / 6f) * (6f - (float)zz);
+                float intensity = (intensityFactor / 8f) * (8f - (float)zz);
                 if ((!lightingDirs[0]) && IsVoxelAt(x, y, z - zz)) { light -= (intensity * 4f); lightingDirs[0] = true; }
                 if ((!lightingDirs[0]) && IsVoxelAt(x, y, z - (zz+5))) { light -= intensity; lightingDirs[0] = true; }
                 if ((!lightingDirs[0]) && IsVoxelAt(x, y, z - (zz + 10))) { light -= intensity; lightingDirs[0] = true; }

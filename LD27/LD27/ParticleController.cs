@@ -91,7 +91,12 @@ namespace LD27
             p.Spawn(pos, speed, scale, col, life, gravity);
         }
 
-        
 
+
+
+        internal void Reset()
+        {
+            foreach (Particle p in Particles) p.Active = false;
+        }
     }
 }

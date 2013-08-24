@@ -10,8 +10,10 @@ namespace LD27
     public class Door
     {
         public Vector3 Position;
+        public BoundingBox CollisionBox;
 
         public bool IsOpen = false;
+        public bool IsBlocked = true;
         public int Dir = 0;
 
         bool opening;
@@ -28,36 +30,47 @@ namespace LD27
             Position = pos;
             Dir = dir;
 
+            if(Dir==0||Dir==2)
+                CollisionBox = new BoundingBox(pos - new Vector3(4f, 1f, 4f), pos + new Vector3(4f, 1f, 4f));
+            else
+                CollisionBox = new BoundingBox(pos - new Vector3(1f, 4f, 4f), pos + new Vector3(1f, 4f, 4f));
+
             spriteSheet = sheet;
         }
 
         public void Update(GameTime gameTime)
         {
-            frameTime += gameTime.ElapsedGameTime.TotalMilliseconds;
-            if (frameTime >= frameTargetTime)
+            if (opening || closing)
             {
-                frameTime = 0;
-                if (opening)
+                frameTime += gameTime.ElapsedGameTime.TotalMilliseconds;
+                if (frameTime >= frameTargetTime)
                 {
-                    currentFrame++;
-                    if (currentFrame == spriteSheet.AnimChunks.Count - 1)
+                    frameTime = 0;
+                    if (opening && currentFrame < spriteSheet.AnimChunks.Count - 1)
                     {
-                        opening = false;
-                        IsOpen = true;
+                        currentFrame++;
+                        if (currentFrame == spriteSheet.AnimChunks.Count - 1)
+                        {
+                            opening = false;
+                            IsOpen = true;
+                        }
                     }
-                }
-                if (closing && currentFrame>0)
-                {
-                    currentFrame--;
-                    if (currentFrame == 0)
+                    if (closing && currentFrame > 0)
                     {
-                        closing = false;
-                        IsOpen = false;
+                        currentFrame--;
+                        if (currentFrame == 0)
+                        {
+                            closing = false;
+                            IsOpen = false;
+                        }
                     }
-                }
 
 
+                }
             }
+
+            if (IsOpen) IsBlocked = false;
+            if (!IsOpen || opening || closing) IsBlocked = true;
         }
 
         public void Draw(GraphicsDevice gd, Camera gameCamera, BasicEffect drawEffect)
@@ -73,14 +86,24 @@ namespace LD27
             }
         }
 
-        internal void Close()
+        internal void Close(bool immediate)
         {
-            closing = true;
+            if (IsOpen)
+            {
+                if (immediate) { IsOpen = false; currentFrame = 0; opening = false; closing = false; }
+                else closing = true;
+            }
         }
 
-        internal void Open()
+        internal void Open(bool immediate)
         {
-            opening = true;
+            if (!IsOpen)
+            {
+                if (immediate) { IsOpen = true; currentFrame = spriteSheet.AnimChunks.Count - 1; closing = false; opening = false; }
+                else opening = true;
+            }
         }
+
+        
     }
 }

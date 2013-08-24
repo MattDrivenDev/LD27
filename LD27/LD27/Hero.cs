@@ -47,9 +47,9 @@ namespace LD27
             };
         }
 
-        public void Update(GameTime gameTime, Camera gameCamera, Room currentRoom)
+        public void Update(GameTime gameTime, Camera gameCamera, Room currentRoom, List<Door> doors, ref Room[,] rooms)
         {
-            CheckCollisions(currentRoom.World);
+            CheckCollisions(currentRoom.World, doors);
             Position += Speed;
 
             Vector2 v2pos = new Vector2(Position.X, Position.Y);
@@ -66,6 +66,14 @@ namespace LD27
                 Rotation = Helper.TurnToFace(v2pos, v2pos + (v2speed * 50f), Rotation, 1f, 0.5f);
             }
 
+            if (Position.X < doors[3].Position.X) { RoomX--; Position = doors[1].Position + new Vector3(0f, 0f, 4f); ResetDoors(doors, ref rooms); }
+            if (Position.X > doors[1].Position.X) { RoomX++; Position = doors[3].Position + new Vector3(0f, 0f, 4f); ResetDoors(doors, ref rooms); }
+            if (Position.Y < doors[0].Position.Y) { RoomY--; Position = doors[2].Position + new Vector3(0f, 0f, 4f); ResetDoors(doors, ref rooms); }
+            if (Position.Y > doors[2].Position.Y) { RoomY++; Position = doors[0].Position + new Vector3(0f, 0f, 4f); ResetDoors(doors, ref rooms); }
+
+            Vector2 p = Helper.RandomPointInCircle(Helper.PointOnCircle(ref v2pos, 1f, (Rotation - MathHelper.Pi) + 0.1f), 0f, 2f);
+            ParticleController.Instance.Spawn(new Vector3(p, Position.Z-1f), new Vector3(0f, 0f, -0.01f - ((float)Helper.Random.NextDouble() * 0.01f)), 0.5f, Color.Black*0.2f, 2000, false);
+
             drawEffect.Projection = gameCamera.projectionMatrix;
             drawEffect.View = gameCamera.viewMatrix;
             drawEffect.World = gameCamera.worldMatrix *
@@ -74,6 +82,16 @@ namespace LD27
                                Matrix.CreateTranslation(new Vector3(0, 0, (-(spriteSheet.Z_SIZE * SpriteVoxel.HALF_SIZE)) + SpriteVoxel.HALF_SIZE)) *
                                Matrix.CreateScale(0.9f) *
                                Matrix.CreateTranslation(Position);
+        }
+
+        private void ResetDoors(List<Door> doors, ref Room[,] rooms)
+        {
+            if (RoomX > 0 && !rooms[RoomX - 1, RoomY].IsGap) doors[3].Open(true); else doors[3].Close(true);
+            if (RoomX < 3 && !rooms[RoomX + 1, RoomY].IsGap) doors[1].Open(true); else doors[1].Close(true);
+            if (RoomY > 0 && !rooms[RoomX, RoomY - 1].IsGap) doors[0].Open(true); else doors[0].Close(true);
+            if (RoomY < 3 && !rooms[RoomX, RoomY + 1].IsGap) doors[2].Open(true); else doors[2].Close(true);
+
+            ParticleController.Instance.Reset();
         }
 
         public void Draw(GraphicsDevice gd, Camera gameCamera)
@@ -94,12 +112,12 @@ namespace LD27
             Speed = dir * moveSpeed;
         }
 
-        void CheckCollisions(VoxelWorld world)
+        void CheckCollisions(VoxelWorld world, List<Door> doors)
         {
-            float checkRadius = 4f;
-            float radiusSweep = 0.5f;
+            float checkRadius = 3f;
+            float radiusSweep = 0.75f;
             Vector2 v2Pos = new Vector2(Position.X, Position.Y);
-            float checkHeight = Position.Z - 4f;
+            float checkHeight = Position.Z - 3f;
             Voxel checkVoxel;
             Vector3 checkPos;
 
@@ -113,6 +131,7 @@ namespace LD27
                     {
                         Speed.Y = 0f;
                     }
+                    foreach (Door d in doors) { if (d.IsBlocked && d.CollisionBox.Contains(checkPos)==ContainmentType.Contains) Speed.Y = 0f; }
                 }
             }
             if (Speed.Y > 0f)
@@ -125,6 +144,8 @@ namespace LD27
                     {
                         Speed.Y = 0f;
                     }
+                    foreach (Door d in doors) { if (d.IsBlocked && d.CollisionBox.Contains(checkPos) == ContainmentType.Contains) Speed.Y = 0f; }
+
                 }
             }
             if (Speed.X < 0f)
@@ -137,6 +158,8 @@ namespace LD27
                     {
                         Speed.X = 0f;
                     }
+                    foreach (Door d in doors) { if (d.IsBlocked && d.CollisionBox.Contains(checkPos) == ContainmentType.Contains) Speed.X = 0f; }
+
                 }
             }
             if (Speed.X > 0f)
@@ -149,8 +172,15 @@ namespace LD27
                     {
                         Speed.X = 0f;
                     }
+                    foreach (Door d in doors) { if (d.IsBlocked && d.CollisionBox.Contains(checkPos) == ContainmentType.Contains) Speed.X = 0f; }
+
                 }
             }
+        }
+
+        internal void TryPlantBomb(Room currentRoom)
+        {
+            BombController.Instance.Spawn(Position + new Vector3(0f, 0f, -3f), currentRoom);
         }
     }
 }

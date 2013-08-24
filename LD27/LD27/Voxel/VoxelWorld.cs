@@ -59,7 +59,7 @@ namespace LD27
             Z_SIZE = Z_CHUNKS * Chunk.Z_SIZE;
         }
 
-        public void Update(GameTime gameTime, Camera gameCamera)
+        public void Update(GameTime gameTime, Camera gameCamera, bool isCurrent)
         {
             X_SIZE = X_CHUNKS * Chunk.X_SIZE;
             Y_SIZE = Y_CHUNKS * Chunk.Y_SIZE;
@@ -68,7 +68,7 @@ namespace LD27
             redrawTime += gameTime.ElapsedGameTime.TotalMilliseconds;
             if (redrawTime > REDRAW_INTERVAL)
             {
-                for (int i = 0; i < 3; i++)
+                for (int i = 0; i < 1; i++)
                 {
                     if (updateQueue.Count > 0)
                     {
@@ -79,33 +79,36 @@ namespace LD27
                 }
             }
 
-            for (int y = 0; y < Y_CHUNKS; y++)
+            if (isCurrent)
             {
-                for (int x = 0; x < X_CHUNKS; x++)
+                for (int y = 0; y < Y_CHUNKS; y++)
                 {
-                    Chunk c = Chunks[x, y, 0];
-                    if (!gameCamera.boundingFrustum.Intersects(c.boundingSphere))//.Transform(Matrix.CreateTranslation(-gameCamera.Position))))
+                    for (int x = 0; x < X_CHUNKS; x++)
                     {
-                        if (c.Visible)
+                        Chunk c = Chunks[x, y, 0];
+                        if (!gameCamera.boundingFrustum.Intersects(c.boundingSphere))//.Transform(Matrix.CreateTranslation(-gameCamera.Position))))
                         {
-                            c.Visible = false;
-                            //c.ClearMem();
+                            if (c.Visible)
+                            {
+                                c.Visible = false;
+                                //c.ClearMem();
+                            }
                         }
-                    }
-                    else
-                    {
-                        if (!c.Visible)
+                        else
                         {
-                            c.Visible = true;
-                            //if (c.Updated) c.UpdateMesh();
-                            //c.UpdateMesh();
+                            if (!c.Visible)
+                            {
+                                c.Visible = true;
+                                //if (c.Updated) c.UpdateMesh();
+                                //c.UpdateMesh();
+                            }
                         }
                     }
                 }
             }
         }
 
-        public void Explode(Vector3 pos, float radius)
+        public void Explode(Vector3 pos, float radius, bool particles)
         {
             BoundingSphere sphere = new BoundingSphere(pos, radius);
             for(float x=pos.X-radius;x<pos.X+radius;x+= Voxel.SIZE)
@@ -123,7 +126,7 @@ namespace LD27
                             if (v.Active && (v.Destructable > 0 || v.Type== VoxelType.Ground))
                             {
                                 SetVoxelActive((int)world.X, (int)world.Y, (int)world.Z, false);
-                                if(Helper.Random.Next(10)==1) ParticleController.Instance.Spawn(screen, new Vector3(-0.05f + ((float)Helper.Random.NextDouble() * 0.1f), -0.05f + ((float)Helper.Random.NextDouble() * 0.1f), -((float)Helper.Random.NextDouble() * 1f)), 0.25f, new Color(v.SR, v.SG, v.SB), 1000, true);
+                                if(Helper.Random.Next(10)==1 && particles) ParticleController.Instance.Spawn(screen, new Vector3(-0.05f + ((float)Helper.Random.NextDouble() * 0.1f), -0.05f + ((float)Helper.Random.NextDouble() * 0.1f), -((float)Helper.Random.NextDouble() * 1f)), 0.25f, new Color(v.SR, v.SG, v.SB), 1000, true);
                             }
                         }
                     }
@@ -143,7 +146,7 @@ namespace LD27
             return screen;
         }
 
-        public void CopySprite(int x, int y, int z, AnimChunk c, int rot)
+        public void CopySprite(int x, int y, int z, AnimChunk c, int rot, byte destruct)
         {
             
             for (int xx = 0; xx < c.X_SIZE; xx++)
@@ -155,13 +158,13 @@ namespace LD27
                         if (c.Voxels[xx, yy, zz].Active)
                         {
                             if(rot==0)
-                                SetVoxel(x + xx, y+ ((c.Z_SIZE-1)-zz), z + yy, true, 0, VoxelType.Prefab, c.Voxels[xx,yy,zz].Color, new Color(c.Voxels[xx,yy,zz].Color.ToVector3()*0.5f));
+                                SetVoxel(x + xx, y+ ((c.Z_SIZE-1)-zz), z + yy, true, destruct, VoxelType.Prefab, c.Voxels[xx,yy,zz].Color, new Color(c.Voxels[xx,yy,zz].Color.ToVector3()*0.5f));
                             if(rot==1)
-                                SetVoxel(x + zz, y + ((c.Z_SIZE - 1) - xx), z + yy, true, 0, VoxelType.Prefab, c.Voxels[xx, yy, zz].Color, new Color(c.Voxels[xx, yy, zz].Color.ToVector3() * 0.5f));
+                                SetVoxel(x + zz, y + ((c.Z_SIZE - 1) - xx), z + yy, true, destruct, VoxelType.Prefab, c.Voxels[xx, yy, zz].Color, new Color(c.Voxels[xx, yy, zz].Color.ToVector3() * 0.5f));
                             if (rot == 2)
-                                SetVoxel(x + xx, y+ ((c.Z_SIZE-1)-zz), z + ((c.Z_SIZE-1) - yy), true, 0, VoxelType.Prefab, c.Voxels[xx,yy,zz].Color, new Color(c.Voxels[xx,yy,zz].Color.ToVector3()*0.5f));
+                                SetVoxel(x + xx, y + ((c.Z_SIZE - 1) - zz), z + ((c.Z_SIZE - 1) - yy), true, destruct, VoxelType.Prefab, c.Voxels[xx, yy, zz].Color, new Color(c.Voxels[xx, yy, zz].Color.ToVector3() * 0.5f));
                             if (rot == 3)
-                                SetVoxel(x + xx, y + ((c.Z_SIZE - 1) - zz), z + yy, true, 0, VoxelType.Prefab, c.Voxels[xx, yy, zz].Color, new Color(c.Voxels[xx, yy, zz].Color.ToVector3() * 0.5f));
+                                SetVoxel(x + xx, y + ((c.Z_SIZE - 1) - zz), z + yy, true, destruct, VoxelType.Prefab, c.Voxels[xx, yy, zz].Color, new Color(c.Voxels[xx, yy, zz].Color.ToVector3() * 0.5f));
 
                         }
                     }

@@ -47,6 +47,8 @@ namespace LD27
 
             Position += Speed;
 
+            if (Position.Z > 20f) Active = false;
+
             if (Time >= Life)
             {
                 Scale -= 0.01f;
