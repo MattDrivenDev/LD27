@@ -34,6 +34,13 @@ namespace LD27
 
         public double knockbackTime = 0;
 
+        public bool attacking = false;
+        public double attackTime = 0;
+        public double attackTargetTime = 50;
+        public int numAttackFrames;
+        public int attackDir=1;
+        public int attackFrame = 0;
+
         public Enemy(Vector3 pos, Room room, VoxelSprite sprite)
         {
             Position = pos;

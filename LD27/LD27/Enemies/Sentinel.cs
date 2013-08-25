@@ -18,6 +18,8 @@ namespace LD27
             offsetFrame = 1;
             Target = Position;
             Rotation = (float)(Helper.Random.NextDouble() * MathHelper.TwoPi);
+
+            numAttackFrames = 6;
         }
 
         public override void Update(GameTime gameTime, Room currentRoom, Hero gameHero, List<Door> doors)
@@ -33,9 +35,36 @@ namespace LD27
 
             if (Vector3.Distance(Position, Target) <= 1f) Target = Position + (new Vector3(Helper.AngleToVector(((Rotation + MathHelper.Pi) - MathHelper.PiOver2) + ((float)Helper.Random.NextDouble() * MathHelper.Pi), 100f), 0f));
 
-            Rotation = Helper.TurnToFace(new Vector2(Position.X, Position.Y), new Vector2(Position.X, Position.Y) + (new Vector2(Speed.X, Speed.Y) * 50f), Rotation, 1f, 1f);
 
-            base.Update(gameTime, currentRoom, gameHero, doors);
+            if (Vector3.Distance(Position, gameHero.Position) < 30f) attacking = true;
+
+            if (attacking)
+            {
+                Rotation = Helper.TurnToFace(new Vector2(Position.X, Position.Y), new Vector2(gameHero.Position.X, gameHero.Position.Y), Rotation, 1f, 0.5f);
+
+                attackTime += gameTime.ElapsedGameTime.TotalMilliseconds;
+                if (attackTime >= attackTargetTime)
+                {
+                    attackTime = 0;
+                    attackFrame += attackDir;
+                    attackTime = 0;
+                    attackFrame+=attackDir;
+
+                    if (attackFrame == numAttackFrames-1 && attackDir == 1)
+                    {
+                    }
+
+                    if (attackFrame == numAttackFrames-1) { attackDir = -1; attackFrame = numAttackFrames-2; }
+                    if (attackFrame == -1) { attackFrame = 0; attacking = false; }
+                }
+            }
+
+            if (!attacking)
+            {
+                Rotation = Helper.TurnToFace(new Vector2(Position.X, Position.Y), new Vector2(Position.X, Position.Y) + (new Vector2(Speed.X, Speed.Y) * 50f), Rotation, 1f, 0.5f);
+
+                base.Update(gameTime, currentRoom, gameHero, doors);
+            }
 
             //if(Speed.Length()<0.01f) 
         }
