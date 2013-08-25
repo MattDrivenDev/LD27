@@ -47,8 +47,6 @@ namespace LD27
                 {
                     attackTime = 0;
                     attackFrame += attackDir;
-                    attackTime = 0;
-                    attackFrame+=attackDir;
 
                     if (attackFrame == numAttackFrames-1 && attackDir == 1)
                     {
