@@ -50,6 +50,18 @@
     <Compile Include="..\LD27\LD27\Door.cs">
       <Link>Door.cs</Link>
     </Compile>
+    <Compile Include="..\LD27\LD27\Enemies\Enemy.cs">
+      <Link>Enemies\Enemy.cs</Link>
+    </Compile>
+    <Compile Include="..\LD27\LD27\Enemies\Manhack.cs">
+      <Link>Enemies\Manhack.cs</Link>
+    </Compile>
+    <Compile Include="..\LD27\LD27\Enemies\Sentinel.cs">
+      <Link>Enemies\Sentinel.cs</Link>
+    </Compile>
+    <Compile Include="..\LD27\LD27\EnemyController.cs">
+      <Link>EnemyController.cs</Link>
+    </Compile>
     <Compile Include="..\LD27\LD27\Helper.cs">
       <Link>Helper.cs</Link>
     </Compile>
@@ -67,6 +79,12 @@
     </Compile>
     <Compile Include="..\LD27\LD27\ParticleCube.cs">
       <Link>ParticleCube.cs</Link>
+    </Compile>
+    <Compile Include="..\LD27\LD27\Projectile.cs">
+      <Link>Projectile.cs</Link>
+    </Compile>
+    <Compile Include="..\LD27\LD27\ProjectileController.cs">
+      <Link>ProjectileController.cs</Link>
     </Compile>
     <Compile Include="..\LD27\LD27\Room.cs">
       <Link>Room.cs</Link>
@@ -112,7 +130,16 @@
   <ItemGroup>
     <Content Include="Icon.ico" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Content Include="..\LD27\LD27\bin\x86\Debug\Content\enemies\manhack.vxs">
+      <Link>Content\enemies\manhack.vxs</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\LD27\LD27\bin\x86\Debug\Content\enemies\sentinel.vxs">
+      <Link>Content\enemies\sentinel.vxs</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
   <ItemGroup>
     <Content Include="..\LD27\LD27\bin\x86\Debug\Content\audio\sfx\roomclunk.xnb">
       <Link>Content\audio\sfx\roomclunk.xnb</Link>
@@ -144,6 +171,12 @@
     </Content>
     <Content Include="..\LD27\LD27\bin\x86\Debug\Content\tiles.vxs">
       <Link>Content\tiles.vxs</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="..\LD27\LD27\bin\x86\Debug\Content\projectiles.vxs">
+      <Link>Content\projectiles.vxs</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

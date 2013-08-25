@@ -12,6 +12,8 @@ namespace LD27
         public Vector3 Position;
         public Vector3 Speed;
 
+        public float Scale = 1f;
+
         public Room Room;
 
         public bool Active = true;
@@ -20,9 +22,15 @@ namespace LD27
 
         public VoxelSprite spriteSheet;
 
-        double animTime = 0;
-        double animTargetTime = 500;
-        double numFrames = 2;
+        public double animTime = 0;
+        public double animTargetTime = 500;
+        public double numFrames = 2;
+
+        public float groundHeight;
+
+        public BoundingSphere boundingSphere = new BoundingSphere();
+
+        public double knockbackTime = 0;
 
         public Enemy(Vector3 pos, Room room, VoxelSprite sprite)
         {
@@ -34,7 +42,7 @@ namespace LD27
 
         public virtual void Update(GameTime gameTime, Room currentRoom, Hero gameHero, List<Door> doors)
         {
-            CheckCollisions(currentRoom.World, doors);
+            CheckCollisions(currentRoom.World, doors, currentRoom, gameHero);
 
             Position += Speed;
 
@@ -50,17 +58,29 @@ namespace LD27
                 }
             }
 
-          
+            for (float z = Position.Z; z < 25f;z+=0.1f)
+            {
+                if (Room.World.GetVoxel(new Vector3(Position.X, Position.Y, z)).Active) { groundHeight = z; break; }
+            }
+
+            boundingSphere = new BoundingSphere(Position, 4f);
+
+            if (knockbackTime > 0) knockbackTime -= gameTime.ElapsedGameTime.TotalMilliseconds;
         }
 
-        public virtual void DoCollide(bool x, bool y, bool z)
+        public virtual void DoHit(Vector3 attackPos, Vector3 vector3, float p)
+        {
+
+        }
+
+        public virtual void DoCollide(bool x, bool y, bool z, Vector3 checkPosition, Room currentRoom, Hero gameHero, bool withPlayer)
         {
             if (x) Speed.X = 0;
             if (y) Speed.Y = 0;
             if (z) Speed.Z = 0;
         }
 
-        public virtual void CheckCollisions(VoxelWorld world, List<Door> doors)
+        public virtual void CheckCollisions(VoxelWorld world, List<Door> doors, Room currentRoom, Hero gameHero)
         {
             float checkRadius = 3.5f;
             float radiusSweep = 0.75f;
@@ -77,9 +97,11 @@ namespace LD27
                     checkVoxel = world.GetVoxel(checkPos);
                     if ((checkVoxel.Active && world.CanCollideWith(checkVoxel.Type)))
                     {
-                        DoCollide(false, true, false);
+                        DoCollide(false, true, false, checkPos, currentRoom, gameHero, false);
                     }
-                    foreach (Door d in doors) { if (d.CollisionBox.Contains(checkPos) == ContainmentType.Contains) DoCollide(false, true, false); ; }
+                    foreach (Door d in doors) { if (d.CollisionBox.Contains(checkPos) == ContainmentType.Contains) DoCollide(false, true, false, checkPos, currentRoom, gameHero, false); }
+                    if(knockbackTime<=0) foreach (Enemy e in EnemyController.Instance.Enemies.Where(en => en.Room == Room)) { if (e.boundingSphere.Contains(checkPos) == ContainmentType.Contains) DoCollide(false, true, false, checkPos, currentRoom, gameHero, false); }
+                    if (gameHero.boundingSphere.Contains(checkPos) == ContainmentType.Contains) DoCollide(false, true, false, checkPos, currentRoom, gameHero, true);
                 }
             }
             if (Speed.Y > 0f)
@@ -90,9 +112,11 @@ namespace LD27
                     checkVoxel = world.GetVoxel(checkPos);
                     if ((checkVoxel.Active && world.CanCollideWith(checkVoxel.Type)))
                     {
-                        DoCollide(false, true, false);
+                        DoCollide(false, true, false, checkPos, currentRoom, gameHero, false);
                     }
-                    foreach (Door d in doors) { if (d.CollisionBox.Contains(checkPos) == ContainmentType.Contains) DoCollide(false, true, false); ; }
+                    foreach (Door d in doors) { if (d.CollisionBox.Contains(checkPos) == ContainmentType.Contains) DoCollide(false, true, false, checkPos, currentRoom, gameHero, false); }
+                    if (knockbackTime <= 0) foreach (Enemy e in EnemyController.Instance.Enemies.Where(en => en.Room == Room)) { if (e.boundingSphere.Contains(checkPos) == ContainmentType.Contains) DoCollide(false, true, false, checkPos, currentRoom, gameHero, false); }
+                    if (gameHero.boundingSphere.Contains(checkPos) == ContainmentType.Contains) DoCollide(false, true, false, checkPos, currentRoom, gameHero, true);
 
                 }
             }
@@ -104,9 +128,11 @@ namespace LD27
                     checkVoxel = world.GetVoxel(checkPos);
                     if ((checkVoxel.Active && world.CanCollideWith(checkVoxel.Type)))
                     {
-                        DoCollide(true, false, false);
+                        DoCollide(true, false, false, checkPos, currentRoom, gameHero, false);
                     }
-                    foreach (Door d in doors) { if (d.IsBlocked && d.CollisionBox.Contains(checkPos) == ContainmentType.Contains) DoCollide(true, false, false); }
+                    foreach (Door d in doors) { if (d.CollisionBox.Contains(checkPos) == ContainmentType.Contains) DoCollide(true, false, false, checkPos, currentRoom, gameHero, false); }
+                    if (knockbackTime <= 0) foreach (Enemy e in EnemyController.Instance.Enemies.Where(en => en.Room == Room)) { if (e.boundingSphere.Contains(checkPos) == ContainmentType.Contains) DoCollide(true, false, false, checkPos, currentRoom, gameHero, false); }
+                    if (gameHero.boundingSphere.Contains(checkPos) == ContainmentType.Contains) DoCollide(true, false, false, checkPos, currentRoom, gameHero, true);
 
                 }
             }
@@ -118,12 +144,16 @@ namespace LD27
                     checkVoxel = world.GetVoxel(checkPos);
                     if ((checkVoxel.Active && world.CanCollideWith(checkVoxel.Type)))
                     {
-                        DoCollide(true, false, false);
+                        DoCollide(true, false, false, checkPos, currentRoom, gameHero, false);
                     }
-                    foreach (Door d in doors) { if (d.IsBlocked && d.CollisionBox.Contains(checkPos) == ContainmentType.Contains) DoCollide(true, false, false); }
+                    foreach (Door d in doors) { if (d.CollisionBox.Contains(checkPos) == ContainmentType.Contains) DoCollide(true, false, false, checkPos, currentRoom, gameHero, false); }
+                    if (knockbackTime <= 0) foreach (Enemy e in EnemyController.Instance.Enemies.Where(en => en.Room == Room)) { if (e.boundingSphere.Contains(checkPos) == ContainmentType.Contains) DoCollide(true, false, false, checkPos, currentRoom, gameHero, false); }
+                    if (gameHero.boundingSphere.Contains(checkPos) == ContainmentType.Contains) DoCollide(true, false, false, checkPos, currentRoom, gameHero, true);
 
                 }
             }
         }
+
+        
     }
 }

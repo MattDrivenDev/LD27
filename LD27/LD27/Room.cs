@@ -123,6 +123,23 @@ namespace LD27
 
             //}
 
+            int enemiesSpawned = 0;
+            for (int x = 1; x < 14; x++)
+                for (int y = 1; y < 8; y++)
+                {
+                    if (!World.GetVoxel((x * Chunk.X_SIZE) + (Chunk.X_SIZE / 2), (y * Chunk.Y_SIZE) + (Chunk.Y_SIZE / 2), 21).Active)
+                    {
+                        // Create an enemy?
+                        if (enemiesSpawned < 4 && Helper.Random.Next(50) == 1)
+                        {
+                            enemiesSpawned++;
+
+                            EnemyType type = (EnemyType)Helper.Random.Next(Enum.GetValues(typeof(EnemyType)).Length);
+                            EnemyController.Instance.Spawn(type, VoxelWorld.ToScreenSpace((x * Chunk.X_SIZE) + (Chunk.X_SIZE / 2), (y * Chunk.Y_SIZE) + (Chunk.Y_SIZE / 2), 21), this);
+                        }
+                    }
+                }
+
             World.UpdateWorldMeshes();
         }
     }

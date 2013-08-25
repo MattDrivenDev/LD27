@@ -76,7 +76,9 @@
     <Compile Include="Bomb.cs" />
     <Compile Include="BombController.cs" />
     <Compile Include="Camera.cs" />
+    <Compile Include="Enemies\Sentinel.cs" />
     <Compile Include="Enemies\Enemy.cs" />
+    <Compile Include="Enemies\Manhack.cs" />
     <Compile Include="EnemyController.cs" />
     <Compile Include="Door.cs" />
     <Compile Include="Helper.cs" />
@@ -84,6 +86,8 @@
     <Compile Include="Particle.cs" />
     <Compile Include="ParticleController.cs" />
     <Compile Include="ParticleCube.cs" />
+    <Compile Include="Projectile.cs" />
+    <Compile Include="ProjectileController.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="LD27Game.cs" />

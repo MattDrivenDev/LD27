@@ -32,6 +32,7 @@ namespace LD27
             //scrapeSound = AudioController.effects["roomscrape"].CreateInstance();
             if(!scrapeSound.IsLooped)
                 scrapeSound.IsLooped = true;
+            scrapeSound.Volume = 0f;
             scrapeSound.Play();
 
         }

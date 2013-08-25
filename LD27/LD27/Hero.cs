@@ -28,6 +28,18 @@ namespace LD27
         double frameTargetTime = 100;
         int currentFrame = 0;
 
+        public BoundingSphere boundingSphere = new BoundingSphere();
+
+        double timeSinceLastHit = 0;
+
+        bool attacking = false;
+        double attackTime = 0;
+        double attackTargetTime = 50;
+        int attackDir;
+        int attackFrame = 0;
+
+        bool defending = false;
+
         public Hero(int startX, int startY, Vector3 pos)
         {
             RoomX = startX;
@@ -49,7 +61,7 @@ namespace LD27
 
         public void Update(GameTime gameTime, Camera gameCamera, Room currentRoom, List<Door> doors, ref Room[,] rooms)
         {
-            CheckCollisions(currentRoom.World, doors);
+            CheckCollisions(currentRoom.World, doors, currentRoom);
             Position += Speed;
 
             Vector2 v2pos = new Vector2(Position.X, Position.Y);
@@ -82,6 +94,51 @@ namespace LD27
                                Matrix.CreateTranslation(new Vector3(0, 0, (-(spriteSheet.Z_SIZE * SpriteVoxel.HALF_SIZE)) + SpriteVoxel.HALF_SIZE)) *
                                Matrix.CreateScale(0.9f) *
                                Matrix.CreateTranslation(Position);
+
+            boundingSphere = new BoundingSphere(Position + new Vector3(0f,0f,-4f), 3f);
+
+            timeSinceLastHit -= gameTime.ElapsedGameTime.TotalMilliseconds;
+
+            if (attacking)
+            {
+                attackTime += gameTime.ElapsedGameTime.TotalMilliseconds;
+                if (attackTime >= attackTargetTime)
+                {
+                    attackTime = 0;
+                    attackFrame+=attackDir;
+
+                    if (attackFrame == 1 && attackDir == 1)
+                    {
+                        bool hit = false;
+                        float radiusSweep = 1f;
+                        foreach (Enemy e in EnemyController.Instance.Enemies.Where(en => en.Room == currentRoom))
+                        {
+                            for (float az = -1f; az > -6f; az -= 1f)
+                            {
+                                for (float a = Rotation - radiusSweep; a < Rotation + radiusSweep; a += 0.02f)
+                                {
+                                    for (float dist = 1f; dist < 5f; dist += 1f)
+                                    {
+                                        Vector3 attackPos = new Vector3(Helper.PointOnCircle(ref v2pos, dist, Rotation), Position.Z + az);
+
+                                        if (e.boundingSphere.Contains(attackPos) == ContainmentType.Contains && !hit)
+                                        {
+                                            e.DoHit(attackPos, new Vector3(Helper.AngleToVector(Rotation, 0.5f), 0f), 10f);
+                                            hit = true;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                    }
+
+                    if (attackFrame == 3) { attackDir = -1; attackFrame = 1; }
+                    if (attackFrame == -1) { attackFrame = 0; attacking = false; }
+
+                }
+            }
+
         }
 
         private void ResetDoors(List<Door> doors, ref Room[,] rooms)
@@ -103,8 +160,43 @@ namespace LD27
 
                 AnimChunk c = spriteSheet.AnimChunks[currentFrame];
                 gd.DrawUserIndexedPrimitives<VertexPositionNormalColor>(PrimitiveType.TriangleList, c.VertexArray, 0, c.VertexArray.Length, c.IndexArray, 0, c.VertexArray.Length / 2);
-                c = spriteSheet.AnimChunks[currentFrame + 4];
-                gd.DrawUserIndexedPrimitives<VertexPositionNormalColor>(PrimitiveType.TriangleList, c.VertexArray, 0, c.VertexArray.Length, c.IndexArray, 0, c.VertexArray.Length / 2);
+
+                if (!attacking && !defending)
+                {
+                    c = spriteSheet.AnimChunks[currentFrame + 4];
+                    gd.DrawUserIndexedPrimitives<VertexPositionNormalColor>(PrimitiveType.TriangleList, c.VertexArray, 0, c.VertexArray.Length, c.IndexArray, 0, c.VertexArray.Length / 2);
+                }
+
+                if (attacking)
+                {
+                    c = spriteSheet.AnimChunks[attackFrame + 8];
+                    gd.DrawUserIndexedPrimitives<VertexPositionNormalColor>(PrimitiveType.TriangleList, c.VertexArray, 0, c.VertexArray.Length, c.IndexArray, 0, c.VertexArray.Length / 2);
+                }
+
+                if(defending)
+                {
+                    c = spriteSheet.AnimChunks[12];
+                    gd.DrawUserIndexedPrimitives<VertexPositionNormalColor>(PrimitiveType.TriangleList, c.VertexArray, 0, c.VertexArray.Length, c.IndexArray, 0, c.VertexArray.Length / 2);
+                }
+            }
+        }
+
+        public void DoAttack()
+        {
+            if (attacking || defending) return;
+
+            attacking = true;
+            attackFrame = 0;
+            attackTime = 0;
+            attackDir = 1;
+        }
+
+        public void DoDefend(bool def)
+        {
+            if (!def) defending = false;
+            if (!attacking && def)
+            {
+                defending = true;
             }
         }
 
@@ -114,7 +206,35 @@ namespace LD27
             Speed = dir * moveSpeed;
         }
 
-        void CheckCollisions(VoxelWorld world, List<Door> doors)
+
+        internal void TryPlantBomb(Room currentRoom)
+        {
+            BombController.Instance.Spawn(Position + new Vector3(0f, 0f, -3f), currentRoom);
+        }
+
+        internal bool DoHit(Vector3 pos, Vector3 speed, float damage)
+        {
+            if (defending)
+            {
+                Vector2 v2pos = new Vector2(Position.X, Position.Y);
+                BoundingSphere shieldSphere = new BoundingSphere(new Vector3(Helper.PointOnCircle(ref v2pos, 3f, Rotation), Position.Z-5f), 4f);
+
+                if(shieldSphere.Contains(pos)== ContainmentType.Contains) return false;
+            }
+
+            if (timeSinceLastHit <= 0)
+            {
+                for (int i = 0; i < 4; i++)
+                {
+                    ParticleController.Instance.Spawn(pos, speed + new Vector3(-0.05f + ((float)Helper.Random.NextDouble() * 0.1f), -0.05f + ((float)Helper.Random.NextDouble() * 0.1f), -0.05f + ((float)Helper.Random.NextDouble() * 0.1f)), 0.5f, new Color(0.5f + ((float)Helper.Random.NextDouble() * 0.5f), 0f, 0f), 1000, true);
+                }
+                timeSinceLastHit = 100;
+            }
+
+            return true;
+        }
+
+        void CheckCollisions(VoxelWorld world, List<Door> doors, Room currentRoom)
         {
             float checkRadius = 3.5f;
             float radiusSweep = 0.75f;
@@ -134,6 +254,8 @@ namespace LD27
                         Speed.Y = 0f;
                     }
                     foreach (Door d in doors) { if (d.IsBlocked && d.CollisionBox.Contains(checkPos)==ContainmentType.Contains) Speed.Y = 0f; }
+                    foreach (Enemy e in EnemyController.Instance.Enemies.Where(en => en.Room == currentRoom)) { if (e.boundingSphere.Contains(checkPos + new Vector3(0f,0f,-5f)) == ContainmentType.Contains) Speed.Y = 0f; }
+
                 }
             }
             if (Speed.Y > 0f)
@@ -147,6 +269,7 @@ namespace LD27
                         Speed.Y = 0f;
                     }
                     foreach (Door d in doors) { if (d.IsBlocked && d.CollisionBox.Contains(checkPos) == ContainmentType.Contains) Speed.Y = 0f; }
+                    foreach (Enemy e in EnemyController.Instance.Enemies.Where(en => en.Room == currentRoom)) { if (e.boundingSphere.Contains(checkPos + new Vector3(0f, 0f, -5f)) == ContainmentType.Contains) Speed.Y = 0f; }
 
                 }
             }
@@ -161,6 +284,7 @@ namespace LD27
                         Speed.X = 0f;
                     }
                     foreach (Door d in doors) { if (d.IsBlocked && d.CollisionBox.Contains(checkPos) == ContainmentType.Contains) Speed.X = 0f; }
+                    foreach (Enemy e in EnemyController.Instance.Enemies.Where(en => en.Room == currentRoom)) { if (e.boundingSphere.Contains(checkPos + new Vector3(0f, 0f, -5f)) == ContainmentType.Contains) Speed.X = 0f; }
 
                 }
             }
@@ -175,14 +299,11 @@ namespace LD27
                         Speed.X = 0f;
                     }
                     foreach (Door d in doors) { if (d.IsBlocked && d.CollisionBox.Contains(checkPos) == ContainmentType.Contains) Speed.X = 0f; }
+                    foreach (Enemy e in EnemyController.Instance.Enemies.Where(en => en.Room == currentRoom)) { if (e.boundingSphere.Contains(checkPos + new Vector3(0f, 0f, -5f)) == ContainmentType.Contains) Speed.X = 0f; }
 
                 }
             }
         }
 
-        internal void TryPlantBomb(Room currentRoom)
-        {
-            BombController.Instance.Spawn(Position + new Vector3(0f, 0f, -3f), currentRoom);
-        }
     }
 }

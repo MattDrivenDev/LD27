@@ -27,6 +27,8 @@ namespace LD27
         Hero gameHero;
         Camera gameCamera;
 
+        EnemyController enemyController;
+        ProjectileController projectileController;
         ParticleController particleController;
         BombController bombController;
 
@@ -100,7 +102,12 @@ namespace LD27
 
             gameCamera = new Camera(GraphicsDevice, GraphicsDevice.Viewport);
             particleController = new ParticleController(GraphicsDevice);
+            projectileController = new ProjectileController(GraphicsDevice);
             bombController = new BombController(GraphicsDevice, objectSheet);
+            enemyController = new EnemyController(GraphicsDevice);
+
+            projectileController.LoadContent(Content);
+            enemyController.LoadContent(Content);
 
             drawEffect = new BasicEffect(GraphicsDevice)
             {
@@ -167,6 +174,9 @@ namespace LD27
                 gameHero.Move(virtualJoystick);
 
                 if ((cks.IsKeyDown(Keys.Space) && !lks.IsKeyDown(Keys.Space)) || (cgs.Buttons.B==ButtonState.Pressed && lgs.Buttons.B!=ButtonState.Pressed)) gameHero.TryPlantBomb(currentRoom);
+                if (cks.IsKeyDown(Keys.Z) || cks.IsKeyDown(Keys.Enter) || cgs.Buttons.A == ButtonState.Pressed) gameHero.DoAttack();
+                if (cks.IsKeyDown(Keys.X) || cks.IsKeyDown(Keys.RightShift) || cgs.Buttons.X == ButtonState.Pressed) gameHero.DoDefend(true); else gameHero.DoDefend(false);
+
 
                 int openCount = 0;
                 foreach (Door d in Doors) if (d.IsOpen) openCount++;
@@ -231,7 +241,9 @@ namespace LD27
                 currentRoom = Rooms[gameHero.RoomX, gameHero.RoomY];
                 currentRoom.Update(gameTime);
 
+                enemyController.Update(gameTime, gameCamera, currentRoom, gameHero, Doors);
                 particleController.Update(gameTime, gameCamera, currentRoom.World);
+                projectileController.Update(gameTime, gameCamera, currentRoom);
                 bombController.Update(gameTime, currentRoom, gameHero);
 
                 foreach (Door d in Doors) d.Update(gameTime);
@@ -290,6 +302,8 @@ namespace LD27
             currentRoom.Draw(GraphicsDevice, gameCamera, drawEffect);
 
             foreach (Door d in Doors) d.Draw(GraphicsDevice, gameCamera, drawEffect);
+            enemyController.Draw(gameCamera, currentRoom);
+            projectileController.Draw(gameCamera, currentRoom);
             bombController.Draw(gameCamera, currentRoom);
 
             gameHero.Draw(GraphicsDevice, gameCamera);

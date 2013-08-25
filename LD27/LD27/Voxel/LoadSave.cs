@@ -105,7 +105,7 @@ namespace LD27
                     str.Read(buffer, 0, msgLength);
                 }
             }
-
+            
             int pos = 0;
 
             int xs = buffer[0];
