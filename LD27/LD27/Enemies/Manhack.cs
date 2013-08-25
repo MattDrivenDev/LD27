@@ -77,13 +77,24 @@ namespace LD27
             {
                 if (!gameHero.DoHit(checkPosition, Speed, 1))
                 {
-
+                    if (x) Speed.X = (Speed.X * -0.9f);
+                    if (y) Speed.Y = (Speed.Y * -0.9f);
+                    if (z) Speed.Z = (Speed.Z * -0.9f);
+                }
+                else
+                {
+                    if (x) Speed.X = 0f;
+                    if (y) Speed.Y = 0f;
+                    if (z) Speed.Z = 0f;
                 }
             }
-
-            if (x) Speed.X = -(Speed.X*0.75f);
-            if (y) Speed.Y = -(Speed.Y*0.75f);
-            if (z) Speed.Z = -(Speed.Z*0.75f);
+            else
+            {
+                if (x) Speed.X = (Speed.X * -0.9f);
+                if (y) Speed.Y = (Speed.Y * -0.9f);
+                if (z) Speed.Z = (Speed.Z * -0.9f);
+            }
+            
 
             if (Speed.Length() > 0.2f)
             {

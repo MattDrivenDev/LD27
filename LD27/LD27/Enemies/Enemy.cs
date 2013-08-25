@@ -99,9 +99,9 @@ namespace LD27
                     {
                         DoCollide(false, true, false, checkPos, currentRoom, gameHero, false);
                     }
-                    foreach (Door d in doors) { if (d.CollisionBox.Contains(checkPos) == ContainmentType.Contains) DoCollide(false, true, false, checkPos, currentRoom, gameHero, false); }
-                    if(knockbackTime<=0) foreach (Enemy e in EnemyController.Instance.Enemies.Where(en => en.Room == Room)) { if (e.boundingSphere.Contains(checkPos) == ContainmentType.Contains) DoCollide(false, true, false, checkPos, currentRoom, gameHero, false); }
-                    if (gameHero.boundingSphere.Contains(checkPos) == ContainmentType.Contains) DoCollide(false, true, false, checkPos, currentRoom, gameHero, true);
+                    foreach (Door d in doors) { if (d.CollisionBox.Contains(checkPos) == ContainmentType.Contains) DoCollide(false, true, false, checkPos, currentRoom, gameHero, false); break; }
+                    if (knockbackTime <= 0) foreach (Enemy e in EnemyController.Instance.Enemies.Where(en => en.Room == Room)) { if (e.boundingSphere.Contains(checkPos) == ContainmentType.Contains) DoCollide(false, true, false, checkPos, currentRoom, gameHero, false); break; }
+                    if (gameHero.boundingSphere.Contains(checkPos) == ContainmentType.Contains) { DoCollide(false, true, false, checkPos, currentRoom, gameHero, true); break; }
                 }
             }
             if (Speed.Y > 0f)
@@ -114,9 +114,9 @@ namespace LD27
                     {
                         DoCollide(false, true, false, checkPos, currentRoom, gameHero, false);
                     }
-                    foreach (Door d in doors) { if (d.CollisionBox.Contains(checkPos) == ContainmentType.Contains) DoCollide(false, true, false, checkPos, currentRoom, gameHero, false); }
-                    if (knockbackTime <= 0) foreach (Enemy e in EnemyController.Instance.Enemies.Where(en => en.Room == Room)) { if (e.boundingSphere.Contains(checkPos) == ContainmentType.Contains) DoCollide(false, true, false, checkPos, currentRoom, gameHero, false); }
-                    if (gameHero.boundingSphere.Contains(checkPos) == ContainmentType.Contains) DoCollide(false, true, false, checkPos, currentRoom, gameHero, true);
+                    foreach (Door d in doors) { if (d.CollisionBox.Contains(checkPos) == ContainmentType.Contains) DoCollide(false, true, false, checkPos, currentRoom, gameHero, false); break; }
+                    if (knockbackTime <= 0) foreach (Enemy e in EnemyController.Instance.Enemies.Where(en => en.Room == Room)) { if (e.boundingSphere.Contains(checkPos) == ContainmentType.Contains) DoCollide(false, true, false, checkPos, currentRoom, gameHero, false); break; }
+                    if (gameHero.boundingSphere.Contains(checkPos) == ContainmentType.Contains) { DoCollide(false, true, false, checkPos, currentRoom, gameHero, true); break; }
 
                 }
             }
@@ -130,9 +130,9 @@ namespace LD27
                     {
                         DoCollide(true, false, false, checkPos, currentRoom, gameHero, false);
                     }
-                    foreach (Door d in doors) { if (d.CollisionBox.Contains(checkPos) == ContainmentType.Contains) DoCollide(true, false, false, checkPos, currentRoom, gameHero, false); }
-                    if (knockbackTime <= 0) foreach (Enemy e in EnemyController.Instance.Enemies.Where(en => en.Room == Room)) { if (e.boundingSphere.Contains(checkPos) == ContainmentType.Contains) DoCollide(true, false, false, checkPos, currentRoom, gameHero, false); }
-                    if (gameHero.boundingSphere.Contains(checkPos) == ContainmentType.Contains) DoCollide(true, false, false, checkPos, currentRoom, gameHero, true);
+                    foreach (Door d in doors) { if (d.CollisionBox.Contains(checkPos) == ContainmentType.Contains) DoCollide(true, false, false, checkPos, currentRoom, gameHero, false); break; }
+                    if (knockbackTime <= 0) foreach (Enemy e in EnemyController.Instance.Enemies.Where(en => en.Room == Room)) { if (e.boundingSphere.Contains(checkPos) == ContainmentType.Contains) DoCollide(true, false, false, checkPos, currentRoom, gameHero, false); break; }
+                    if (gameHero.boundingSphere.Contains(checkPos) == ContainmentType.Contains) { DoCollide(true, false, false, checkPos, currentRoom, gameHero, true); break; }
 
                 }
             }
@@ -146,9 +146,9 @@ namespace LD27
                     {
                         DoCollide(true, false, false, checkPos, currentRoom, gameHero, false);
                     }
-                    foreach (Door d in doors) { if (d.CollisionBox.Contains(checkPos) == ContainmentType.Contains) DoCollide(true, false, false, checkPos, currentRoom, gameHero, false); }
-                    if (knockbackTime <= 0) foreach (Enemy e in EnemyController.Instance.Enemies.Where(en => en.Room == Room)) { if (e.boundingSphere.Contains(checkPos) == ContainmentType.Contains) DoCollide(true, false, false, checkPos, currentRoom, gameHero, false); }
-                    if (gameHero.boundingSphere.Contains(checkPos) == ContainmentType.Contains) DoCollide(true, false, false, checkPos, currentRoom, gameHero, true);
+                    foreach (Door d in doors) { if (d.CollisionBox.Contains(checkPos) == ContainmentType.Contains) DoCollide(true, false, false, checkPos, currentRoom, gameHero, false); break; }
+                    if (knockbackTime <= 0) foreach (Enemy e in EnemyController.Instance.Enemies.Where(en => en.Room == Room)) { if (e.boundingSphere.Contains(checkPos) == ContainmentType.Contains) DoCollide(true, false, false, checkPos, currentRoom, gameHero, false); break; }
+                    if (gameHero.boundingSphere.Contains(checkPos) == ContainmentType.Contains) { DoCollide(true, false, false, checkPos, currentRoom, gameHero, true); break;}
 
                 }
             }
