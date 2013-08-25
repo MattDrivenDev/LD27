@@ -13,7 +13,8 @@ namespace LD27
     {
         Manhack,
         Sentinel,
-        Head
+        Head,
+        Ooze
     }
 
     public class EnemyController
@@ -52,6 +53,10 @@ namespace LD27
             VoxelSprite head = new VoxelSprite(16, 16, 16);
             LoadVoxels.LoadSprite(Path.Combine(content.RootDirectory, "enemies\\head.vxs"), ref head);
             spriteSheets.Add("Head", head);
+
+            VoxelSprite ooze = new VoxelSprite(16, 16, 16);
+            LoadVoxels.LoadSprite(Path.Combine(content.RootDirectory, "enemies\\ooze.vxs"), ref ooze);
+            spriteSheets.Add("Ooze", ooze);
         }
 
         public void Spawn(EnemyType type, Vector3 pos, Room room)
@@ -66,6 +71,9 @@ namespace LD27
                     break;
                 case EnemyType.Head:
                     Enemies.Add(new Sentinel(pos, room, spriteSheets["Head"]));
+                    break;
+                case EnemyType.Ooze:
+                    Enemies.Add(new Sentinel(pos, room, spriteSheets["Ooze"]));
                     break;
             }
         }
