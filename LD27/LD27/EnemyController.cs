@@ -81,21 +81,22 @@ namespace LD27
                 drawEffect.Alpha = 1f;
                 drawEffect.World = gameCamera.worldMatrix *
                                        Matrix.CreateRotationX(MathHelper.PiOver2) *
-                                       Matrix.CreateRotationZ(-MathHelper.PiOver2) *
+                                       Matrix.CreateRotationZ(e.Rotation-MathHelper.PiOver2) *
                                        Matrix.CreateScale(e.Scale) *
                                        Matrix.CreateTranslation(e.Position);
+
                 foreach (EffectPass pass in drawEffect.CurrentTechnique.Passes)
                 {
                     pass.Apply();
 
-                    graphicsDevice.DrawUserIndexedPrimitives<VertexPositionNormalColor>(PrimitiveType.TriangleList, e.spriteSheet.AnimChunks[e.CurrentFrame].VertexArray, 0, e.spriteSheet.AnimChunks[e.CurrentFrame].VertexArray.Length, e.spriteSheet.AnimChunks[e.CurrentFrame].IndexArray, 0, e.spriteSheet.AnimChunks[e.CurrentFrame].VertexArray.Length / 2);
+                    graphicsDevice.DrawUserIndexedPrimitives<VertexPositionNormalColor>(PrimitiveType.TriangleList, e.spriteSheet.AnimChunks[e.CurrentFrame + e.offsetFrame].VertexArray, 0, e.spriteSheet.AnimChunks[e.CurrentFrame + e.offsetFrame].VertexArray.Length, e.spriteSheet.AnimChunks[e.CurrentFrame + e.offsetFrame].IndexArray, 0, e.spriteSheet.AnimChunks[e.CurrentFrame + e.offsetFrame].VertexArray.Length / 2);
 
                 }
 
                 drawEffect.Alpha = 0.2f;
                 drawEffect.World = gameCamera.worldMatrix *
                                        Matrix.CreateRotationX(MathHelper.PiOver2) *
-                                       Matrix.CreateRotationZ(-MathHelper.PiOver2) *
+                                       Matrix.CreateRotationZ(e.Rotation-MathHelper.PiOver2) *
                                        Matrix.CreateTranslation(new Vector3(0, 0, (-(e.spriteSheet.Z_SIZE * SpriteVoxel.HALF_SIZE)) + SpriteVoxel.HALF_SIZE)) *
                                        Matrix.CreateScale(e.Scale) *
                                        Matrix.CreateScale(new Vector3(1f,1f,0.1f)) * 
