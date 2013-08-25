@@ -37,6 +37,7 @@ namespace LD27
 
         MouseState lms;
         KeyboardState lks;
+        GamePadState lgs;
 
         VoxelSprite tileSheet;
         VoxelSprite doorSheet;
@@ -146,7 +147,7 @@ namespace LD27
             {
                 MouseState cms = Mouse.GetState();
                 KeyboardState cks = Keyboard.GetState();
-                GamePadState gp = GamePad.GetState(PlayerIndex.One);
+                GamePadState cgs = GamePad.GetState(PlayerIndex.One);
 
                 Vector2 mp2D = Vector2.Clamp(new Vector2(cms.X, cms.Y), Vector2.Zero, new Vector2(GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height));
                 Vector3 mousePos = Helper.ProjectMousePosition(mp2D, GraphicsDevice.Viewport, gameCamera.worldMatrix, gameCamera.viewMatrix, gameCamera.projectionMatrix, 0f);
@@ -157,15 +158,15 @@ namespace LD27
                 if (cks.IsKeyDown(Keys.A) || cks.IsKeyDown(Keys.Down)) virtualJoystick.Y = 1;
                 if (cks.IsKeyDown(Keys.D) || cks.IsKeyDown(Keys.Right)) virtualJoystick.X = 1;
                 if(virtualJoystick.Length()>0f) virtualJoystick.Normalize();
-                if (gp.ThumbSticks.Left.Length() > 0.1f)
+                if (cgs.ThumbSticks.Left.Length() > 0.1f)
                 {
-                    virtualJoystick = gp.ThumbSticks.Left;
+                    virtualJoystick = cgs.ThumbSticks.Left;
                     virtualJoystick.Y = -virtualJoystick.Y;
                 }
 
                 gameHero.Move(virtualJoystick);
 
-                if (cks.IsKeyDown(Keys.Space) && !lks.IsKeyDown(Keys.Space)) gameHero.TryPlantBomb(currentRoom);
+                if ((cks.IsKeyDown(Keys.Space) && !lks.IsKeyDown(Keys.Space)) || (cgs.Buttons.B==ButtonState.Pressed && lgs.Buttons.B!=ButtonState.Pressed)) gameHero.TryPlantBomb(currentRoom);
 
                 int openCount = 0;
                 foreach (Door d in Doors) if (d.IsOpen) openCount++;
@@ -228,6 +229,7 @@ namespace LD27
 
                 gameHero.Update(gameTime, gameCamera, currentRoom, Doors, ref Rooms);
                 currentRoom = Rooms[gameHero.RoomX, gameHero.RoomY];
+                currentRoom.Update(gameTime);
 
                 particleController.Update(gameTime, gameCamera, currentRoom.World);
                 bombController.Update(gameTime, currentRoom, gameHero);
@@ -239,6 +241,7 @@ namespace LD27
 
                 lms = cms;
                 lks = cks;
+                lgs = cgs;
             }
 
             base.Update(gameTime);
@@ -283,6 +286,8 @@ namespace LD27
                     }
                 }
             }
+
+            currentRoom.Draw(GraphicsDevice, gameCamera, drawEffect);
 
             foreach (Door d in Doors) d.Draw(GraphicsDevice, gameCamera, drawEffect);
             bombController.Draw(gameCamera, currentRoom);
@@ -356,9 +361,9 @@ namespace LD27
                 {
                     if (!(x == gapRoomX && y == gapRoomY))
                     {
-                        Rooms[x, y] = new Room(tileSheet, false);
+                        Rooms[x, y] = new Room(tileSheet, objectSheet, false);
                     }
-                    else Rooms[x, y] = new Room(tileSheet, true);
+                    else Rooms[x, y] = new Room(tileSheet, objectSheet, true);
                     generatedPercent += (int)roomPercent;
                 }
 

@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,8 +12,17 @@ namespace LD27
         public VoxelWorld World;
 
         public bool IsGap = false;
+        public bool IsComplete = false;
 
-        public Room(VoxelSprite tileSheet, bool isGap)
+        VoxelSprite objectSheet;
+
+        float[,] wallRots = new float[15, 9];
+
+        Color wallColor = Color.Red;
+        float wallGlow = 0f;
+        float wallGlowTarget = -0.3f;
+
+        public Room(VoxelSprite tileSheet, VoxelSprite objects, bool isGap)
         {
             IsGap = isGap;
 
@@ -21,17 +32,57 @@ namespace LD27
 
                 CreateMap(tileSheet);
             }
+
+            objectSheet = objects;
+        }
+
+        public void Update(GameTime gameTime)
+        {
+            wallGlow = MathHelper.Lerp(wallGlow, wallGlowTarget, 0.01f);
+            if (wallGlow < -0.29f) wallGlowTarget = 0.3f;
+            if (wallGlow > 0.29f) wallGlowTarget = -0.3f;
+
+            wallColor = new Color(0.7f + wallGlow, 0f, 0f);
+        }
+
+        public void Draw(GraphicsDevice gd, Camera gameCamera, BasicEffect drawEffect)
+        {
+            drawEffect.DiffuseColor = wallColor.ToVector3();
+
+             for (int x = 0; x < 15; x++)
+                for (int y = 0; y < 9; y++)
+                    if (x == 0 || x == 14 || y == 0 || y == 8)
+                        if (x != 7 && y != 4)
+                        {
+                            drawEffect.World = Matrix.CreateRotationX(MathHelper.PiOver2) *
+                                               Matrix.CreateRotationZ(wallRots[x,y]) * 
+                                               Matrix.CreateTranslation(VoxelWorld.ToScreenSpace((x * 16) + 7, (y * 16) + 7, 21) + (Vector3.One * Voxel.HALF_SIZE)) * 
+                                               gameCamera.worldMatrix;
+                            foreach (EffectPass pass in drawEffect.CurrentTechnique.Passes)
+                            {
+                                pass.Apply();
+
+                                AnimChunk c = objectSheet.AnimChunks[7];
+                                gd.DrawUserIndexedPrimitives<VertexPositionNormalColor>(PrimitiveType.TriangleList, c.VertexArray, 0, c.VertexArray.Length, c.IndexArray, 0, c.VertexArray.Length / 2);
+                            }
+                        }
+
+             drawEffect.DiffuseColor = Color.White.ToVector3();
         }
 
         void CreateMap(VoxelSprite tileSheet)
         {
-            for (int x = 0; x < 16; x++)
-                for (int y = 0; y < 10; y++)
+
+            for (int x = 0; x < 15; x++)
+                for (int y = 0; y < 9; y++)
+                {
+                    wallRots[x, y] = MathHelper.PiOver2 * (float)Helper.Random.Next(4);
                     if (x == 0 || x == 14 || y == 0 || y == 8)
-                        if(x!=7 && y!=4)
+                        if (x != 7 && y != 4)
                             World.CopySprite(x * Chunk.X_SIZE, y * Chunk.X_SIZE, 14, tileSheet.AnimChunks[0], Helper.Random.Next(4), 0);
                         else
-                            World.CopySprite(x * Chunk.X_SIZE, y * Chunk.X_SIZE, 14, tileSheet.AnimChunks[(x==7?2:1)], 0, 0);
+                            World.CopySprite(x * Chunk.X_SIZE, y * Chunk.X_SIZE, 14, tileSheet.AnimChunks[(x == 7 ? 2 : 1)], 0, 0);
+                }
 
 
 

@@ -103,6 +103,8 @@ namespace LD27
 
                 AnimChunk c = spriteSheet.AnimChunks[currentFrame];
                 gd.DrawUserIndexedPrimitives<VertexPositionNormalColor>(PrimitiveType.TriangleList, c.VertexArray, 0, c.VertexArray.Length, c.IndexArray, 0, c.VertexArray.Length / 2);
+                c = spriteSheet.AnimChunks[currentFrame + 4];
+                gd.DrawUserIndexedPrimitives<VertexPositionNormalColor>(PrimitiveType.TriangleList, c.VertexArray, 0, c.VertexArray.Length, c.IndexArray, 0, c.VertexArray.Length / 2);
             }
         }
 
@@ -114,10 +116,10 @@ namespace LD27
 
         void CheckCollisions(VoxelWorld world, List<Door> doors)
         {
-            float checkRadius = 3f;
+            float checkRadius = 3.5f;
             float radiusSweep = 0.75f;
             Vector2 v2Pos = new Vector2(Position.X, Position.Y);
-            float checkHeight = Position.Z - 3f;
+            float checkHeight = Position.Z - 1f;
             Voxel checkVoxel;
             Vector3 checkPos;
 
