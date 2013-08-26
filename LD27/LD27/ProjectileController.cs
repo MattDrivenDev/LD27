@@ -39,11 +39,11 @@ namespace LD27
             LoadVoxels.LoadSprite(Path.Combine(content.RootDirectory, "projectiles.vxs"), ref projectileStrip);
         }
 
-        public void Update(GameTime gameTime, Camera gameCamera, Room currentRoom)
+        public void Update(GameTime gameTime, Camera gameCamera, Hero gameHero, Room currentRoom)
         {
             foreach (Projectile p in Projectiles.Where(proj => proj.Active))
             {
-                p.Update(gameTime, currentRoom);
+                p.Update(gameTime, currentRoom, gameHero);
             }
 
             Projectiles.RemoveAll(proj => !proj.Active);
@@ -57,6 +57,7 @@ namespace LD27
         {
             foreach (Projectile p in Projectiles.Where(proj => proj.Type == ProjectileType.Laserbolt && proj.Room == currentRoom))
             {
+                drawEffect.Alpha = 0.5f;
                 drawEffect.World = gameCamera.worldMatrix *
                                    Matrix.CreateRotationX(MathHelper.PiOver2) *
                                    Matrix.CreateRotationZ(-MathHelper.PiOver2) *
@@ -67,9 +68,10 @@ namespace LD27
                 {
                     pass.Apply();
                     
-                    graphicsDevice.DrawUserIndexedPrimitives<VertexPositionNormalColor>(PrimitiveType.TriangleList, projectileStrip.AnimChunks[0].VertexArray, 0, projectileStrip.AnimChunks[0].VertexArray.Length, projectileStrip.AnimChunks[0].IndexArray, 0, projectileStrip.AnimChunks[0].VertexArray.Length / 2);
+                    graphicsDevice.DrawUserIndexedPrimitives<VertexPositionNormalColor>(PrimitiveType.TriangleList, projectileStrip.AnimChunks[1].VertexArray, 0, projectileStrip.AnimChunks[1].VertexArray.Length, projectileStrip.AnimChunks[1].IndexArray, 0, projectileStrip.AnimChunks[1].VertexArray.Length / 2);
 
                 }
+                drawEffect.Alpha = 1f;
             }
             //foreach (Projectile p in Projectiles.Where(proj => proj.Type == ProjectileType.Grenade))
             //{

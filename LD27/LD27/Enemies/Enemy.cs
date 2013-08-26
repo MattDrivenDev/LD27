@@ -12,6 +12,7 @@ namespace LD27
         public Vector3 Position;
         public Vector3 Speed;
         public float Rotation;
+        public float Health = 100f;
 
         public float Scale = 1f;
 
@@ -75,11 +76,13 @@ namespace LD27
             boundingSphere = new BoundingSphere(Position, 4f);
 
             if (knockbackTime > 0) knockbackTime -= gameTime.ElapsedGameTime.TotalMilliseconds;
+
+            if (Health <= 0f) Die();
         }
 
-        public virtual void DoHit(Vector3 attackPos, Vector3 vector3, float p)
+        public virtual void DoHit(Vector3 attackPos, Vector3 speed, float damage)
         {
-
+            Health -= damage;
         }
 
         public virtual void DoCollide(bool x, bool y, bool z, Vector3 checkPosition, Room currentRoom, Hero gameHero, bool withPlayer)
@@ -87,6 +90,27 @@ namespace LD27
             if (x) Speed.X = 0;
             if (y) Speed.Y = 0;
             if (z) Speed.Z = 0;
+
+            
+        }
+
+        public virtual void Die()
+        {
+            
+           
+            for (int x = 0; x < spriteSheet.X_SIZE; x++)
+                for (int y = 0; y < spriteSheet.Y_SIZE; y++)
+                    for (int z = 0; z < spriteSheet.Z_SIZE; z++)
+                    {
+                        SpriteVoxel v = spriteSheet.AnimChunks[CurrentFrame].Voxels[x, y, z];
+                        if (!v.Active) continue;
+                        Vector3 pos = (- new Vector3(spriteSheet.X_SIZE * Voxel.HALF_SIZE, spriteSheet.Y_SIZE * Voxel.HALF_SIZE, spriteSheet.Z_SIZE * Voxel.HALF_SIZE) * Scale) + (new Vector3(x * Voxel.SIZE, y * Voxel.SIZE, z * Voxel.SIZE) * Scale);
+                        pos = Position + Vector3.Transform(pos, Matrix.CreateRotationX(MathHelper.PiOver2) * Matrix.CreateRotationZ(Rotation));
+                        ParticleController.Instance.Spawn(pos, -(Vector3.One * 0.1f) + (Vector3.One * ((float)Helper.Random.NextDouble()*0.2f)) , 0.3f, v.Color, 3000, true);
+                    }
+
+            Active = false;
+            
         }
 
         public virtual void CheckCollisions(VoxelWorld world, List<Door> doors, Room currentRoom, Hero gameHero)

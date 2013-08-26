@@ -45,6 +45,17 @@ namespace LD27
                 Room.World.Explode(Position, 8f, (currentRoom == Room));
                 if (Room == currentRoom) ParticleController.Instance.SpawnExplosion(Position);
 
+                foreach (Enemy e in EnemyController.Instance.Enemies.Where(en => en.Room == currentRoom))
+                {
+                    if (Vector3.Distance(Position, e.Position) < 10f)
+                    {
+                        float dam = (100f / 10f) * Vector3.Distance(Position, e.Position);
+                        Vector3 speed = (Position-e.Position);
+                        speed.Normalize();
+                        e.DoHit(e.Position, speed * 0.5f, dam); 
+                    }
+                }
+
             }
         }
     }

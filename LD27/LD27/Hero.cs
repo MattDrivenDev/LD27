@@ -115,11 +115,11 @@ namespace LD27
                         float radiusSweep = 1f;
                         foreach (Enemy e in EnemyController.Instance.Enemies.Where(en => en.Room == currentRoom))
                         {
-                            for (float az = -1f; az > -6f; az -= 1f)
+                            for (float az = 0f; az > -6f; az -= 1f)
                             {
                                 for (float a = Rotation - radiusSweep; a < Rotation + radiusSweep; a += 0.02f)
                                 {
-                                    for (float dist = 1f; dist < 5f; dist += 1f)
+                                    for (float dist = 0f; dist < 5f; dist += 0.2f)
                                     {
                                         Vector3 attackPos = new Vector3(Helper.PointOnCircle(ref v2pos, dist, Rotation), Position.Z + az);
 

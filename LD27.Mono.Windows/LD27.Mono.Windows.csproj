@@ -53,8 +53,14 @@
     <Compile Include="..\LD27\LD27\Enemies\Enemy.cs">
       <Link>Enemies\Enemy.cs</Link>
     </Compile>
+    <Compile Include="..\LD27\LD27\Enemies\Head.cs">
+      <Link>Enemies\Head.cs</Link>
+    </Compile>
     <Compile Include="..\LD27\LD27\Enemies\Manhack.cs">
       <Link>Enemies\Manhack.cs</Link>
+    </Compile>
+    <Compile Include="..\LD27\LD27\Enemies\Ooze.cs">
+      <Link>Enemies\Ooze.cs</Link>
     </Compile>
     <Compile Include="..\LD27\LD27\Enemies\Sentinel.cs">
       <Link>Enemies\Sentinel.cs</Link>
@@ -120,12 +126,24 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Reference Include="Lidgren.Network, Version=2011.3.12.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\MonoGame\MonoGame.Framework\bin\WindowsGL\Debug\Lidgren.Network.dll</HintPath>
+    </Reference>
     <Reference Include="MonoGame.Framework, Version=3.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\MonoGame\MonoGame.Framework\bin\Windows\Debug\MonoGame.Framework.dll</HintPath>
+      <HintPath>..\..\..\MonoGame\MonoGame.Framework\bin\WindowsGL\Debug\MonoGame.Framework.dll</HintPath>
+    </Reference>
+    <Reference Include="OpenTK, Version=1.1.0.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\MonoGame\MonoGame.Framework\bin\WindowsGL\Debug\OpenTK.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.XML" />
+    <Reference Include="Tao.Sdl, Version=1.2.13.0, Culture=neutral, PublicKeyToken=9c7a200e36c0094e, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\MonoGame\MonoGame.Framework\bin\WindowsGL\Debug\Tao.Sdl.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Content Include="Icon.ico" />
@@ -177,6 +195,16 @@
   <ItemGroup>
     <Content Include="..\LD27\LD27\bin\x86\Debug\Content\projectiles.vxs">
       <Link>Content\projectiles.vxs</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="..\LD27\LD27Content\enemies\head.vxs">
+      <Link>Content\enemies\head.vxs</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\LD27\LD27Content\enemies\ooze.vxs">
+      <Link>Content\enemies\ooze.vxs</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

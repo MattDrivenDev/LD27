@@ -54,6 +54,8 @@ namespace LD27
 
             if (knockbackTime > 0) knockbackTime -= gameTime.ElapsedGameTime.TotalMilliseconds;
 
+            if (Health <= 0f) Die();
+
         }
 
         public override void DoHit(Vector3 attackPos, Vector3 speed, float damage)
@@ -69,6 +71,10 @@ namespace LD27
 
             knockbackTime = 2000;
             //base.DoHit(attackPos, vector3, p);
+
+            Health -= damage;
+
+
         }
 
         public override void DoCollide(bool x, bool y, bool z, Vector3 checkPosition, Room currentRoom, Hero gameHero, bool withPlayer)

@@ -29,6 +29,8 @@ namespace LD27
         public Vector3 rotSpeed;
         public bool affectedByGravity;
 
+        public bool Deflected = false;
+
         float rotX;
         float rotY;
 
@@ -37,13 +39,13 @@ namespace LD27
 
         }
 
-        public void Update(GameTime gameTime, Room currentRoom)
+        public void Update(GameTime gameTime, Room currentRoom, Hero gameHero)
         {
             Time += gameTime.ElapsedGameTime.TotalMilliseconds;
 
             if (affectedByGravity) Speed.Z += GRAVITY;
 
-            CheckCollisions(currentRoom);
+            CheckCollisions(currentRoom, gameHero);
 
             Position += Speed;
 
@@ -67,7 +69,7 @@ namespace LD27
             
         }
 
-        void CheckCollisions(Room currentRoom)
+        void CheckCollisions(Room currentRoom, Hero gameHero)
         {
             Vector3 worldSpace; 
             switch (Type)
@@ -84,9 +86,22 @@ namespace LD27
                             {
                                 Room.World.SetVoxelActive((int)worldSpace.X, (int)worldSpace.Y, (int)worldSpace.Z, false);
                                 if(Room == currentRoom) for (int i = 0; i < 4; i++) ParticleController.Instance.Spawn(Position, new Vector3(-0.05f + ((float)Helper.Random.NextDouble() * 0.1f), -0.05f + ((float)Helper.Random.NextDouble() * 0.1f), -((float)Helper.Random.NextDouble() * 0.5f)), 0.25f, new Color(v.SR, v.SG, v.SB), 1000, true);
+                               
                             }
                             Active = false;
                         }
+                        if (gameHero.boundingSphere.Contains(Position + (d * ((Position + Speed) - Position))) == ContainmentType.Contains)
+                        {
+                            if (!gameHero.DoHit(Position + (d * ((Position + Speed) - Position)), Speed, 5f))
+                            {
+                                Speed = -Speed;
+                                Deflected = true;
+                                Rotation = Matrix.CreateRotationZ(Helper.V2ToAngle(new Vector2(Speed.X,Speed.Y)));
+                            }
+                            else Active = false;
+                        }
+                        if (Deflected) foreach (Enemy e in EnemyController.Instance.Enemies.Where(en => en.Room == Room)) { if (e.boundingSphere.Contains(Position + (d * ((Position + Speed) - Position))) == ContainmentType.Contains) { e.DoHit(Position + (d * ((Position + Speed) - Position)), Speed, 5f); Active = false; } }
+
                     }
                     break;
                 //case ProjectileType.Grenade:

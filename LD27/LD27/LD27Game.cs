@@ -245,7 +245,7 @@ namespace LD27
 
                 enemyController.Update(gameTime, gameCamera, currentRoom, gameHero, Doors);
                 particleController.Update(gameTime, gameCamera, currentRoom.World);
-                projectileController.Update(gameTime, gameCamera, currentRoom);
+                projectileController.Update(gameTime, gameCamera, gameHero, currentRoom);
                 bombController.Update(gameTime, currentRoom, gameHero);
 
                 foreach (Door d in Doors) d.Update(gameTime);
